@@ -40,7 +40,52 @@ public class MainActivity extends Activity {
         s.setLoadWithOverviewMode(false);
         s.setUseWideViewPort(false);
 
-        webView.setWebViewClient(new WebViewClient());
+        webView.setWebViewClient(new WebViewClient() {
+    @Override
+    public boolean shouldOverrideUrlLoading(WebView view, String url) {
+        if (url != null && url.startsWith("mailto:")) {
+            try {
+                Intent emailIntent = new Intent(Intent.ACTION_SENDTO);
+                emailIntent.setData(Uri.parse(url));
+                startActivity(emailIntent);
+            } catch (Exception e) {
+                Toast.makeText(
+                        MainActivity.this,
+                        "No email app found",
+                        Toast.LENGTH_LONG
+                ).show();
+            }
+            return true;
+        }
+
+        return false;
+    }
+
+    @Override
+    public boolean shouldOverrideUrlLoading(
+            WebView view,
+            WebResourceRequest request
+    ) {
+        String url = request.getUrl().toString();
+
+        if (url.startsWith("mailto:")) {
+            try {
+                Intent emailIntent = new Intent(Intent.ACTION_SENDTO);
+                emailIntent.setData(Uri.parse(url));
+                startActivity(emailIntent);
+            } catch (Exception e) {
+                Toast.makeText(
+                        MainActivity.this,
+                        "No email app found",
+                        Toast.LENGTH_LONG
+                ).show();
+            }
+            return true;
+        }
+
+        return false;
+    }
+});
         webView.setWebChromeClient(new WebChromeClient() {
             @Override public boolean onShowFileChooser(WebView view, ValueCallback<Uri[]> callback, FileChooserParams params) {
                 if (filePathCallback != null) filePathCallback.onReceiveValue(null);
