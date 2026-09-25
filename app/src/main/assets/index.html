@@ -967,6 +967,160 @@ h3 {
   color: #1f2937 !important;
   font-weight: 700 !important;
 }
+    /* ===== SOLAR METER - MODERN GUI ===== */
+
+/* App background */
+body {
+  background: #f5f7fb !important;
+}
+
+/* All main cards */
+.card {
+  background: #ffffff !important;
+  border: 1px solid #e3e8ef !important;
+  border-radius: 18px !important;
+  box-shadow: 0 4px 16px rgba(31, 41, 55, 0.07) !important;
+  padding: 18px !important;
+  margin-bottom: 14px !important;
+}
+
+/* Main section headings */
+.card h2 {
+  color: #263238 !important;
+  background: #f4f7fb !important;
+  border-radius: 12px !important;
+  padding: 11px 13px !important;
+  font-weight: 700 !important;
+  margin-bottom: 16px !important;
+}
+
+/* Field labels */
+.card label {
+  color: #263238 !important;
+  font-weight: 700 !important;
+}
+
+/* Inputs */
+.card input,
+.card select,
+.card textarea {
+  background: #ffffff !important;
+  border: 1px solid #d8e0e8 !important;
+  border-radius: 11px !important;
+  min-height: 44px;
+  padding: 10px 12px !important;
+}
+
+/* Input focus */
+.card input:focus,
+.card select:focus,
+.card textarea:focus {
+  border-color: #4a9ae7 !important;
+  box-shadow: 0 0 0 3px rgba(74,154,231,0.12) !important;
+}
+
+/* Import / Export / Generation section labels */
+.section-label {
+  color: #ffffff !important;
+  font-weight: 700 !important;
+  border: none !important;
+  border-radius: 11px !important;
+  padding: 10px 13px !important;
+  margin-top: 10px !important;
+}
+
+/* Import = blue */
+.section-label:nth-of-type(1) {
+  background: #3b82f6 !important;
+}
+
+/* Export = green */
+.section-label:nth-of-type(2) {
+  background: #22a06b !important;
+}
+
+/* Solar = orange */
+.section-label:nth-of-type(3) {
+  background: #f28c28 !important;
+}
+
+/* Result cards */
+.result {
+  border-radius: 15px !important;
+  background: #ffffff !important;
+  border: 1px solid #e1e7ee !important;
+  box-shadow: 0 3px 12px rgba(31,41,55,0.06) !important;
+}
+
+/* Result labels */
+.result .label {
+  color: #263238 !important;
+  font-weight: 700 !important;
+}
+
+/* Buttons */
+button {
+  border-radius: 11px !important;
+  font-weight: 700 !important;
+  min-height: 42px;
+}
+
+/* Primary button */
+.btn-primary {
+  background: #3f93e6 !important;
+  color: #ffffff !important;
+  box-shadow: 0 4px 10px rgba(63,147,230,0.20) !important;
+}
+
+/* Secondary button */
+.btn-secondary {
+  background: #eef2f6 !important;
+  color: #263238 !important;
+  border: 1px solid #dce3ea !important;
+}
+
+/* Tables */
+table {
+  border-radius: 14px !important;
+  overflow: hidden !important;
+}
+
+th {
+  background: #eef3f8 !important;
+  color: #263238 !important;
+  font-weight: 700 !important;
+}
+
+td {
+  color: #374151 !important;
+}
+
+/* Navigation */
+.quick-nav {
+  border-radius: 16px !important;
+  background: #ffffff !important;
+  box-shadow: 0 3px 12px rgba(31,41,55,0.07) !important;
+}
+
+/* Mobile spacing */
+@media (max-width: 560px) {
+  body {
+    padding: 10px 10px 60px !important;
+  }
+
+  .card {
+    padding: 14px !important;
+    border-radius: 16px !important;
+  }
+
+  .card h2 {
+    font-size: 1rem !important;
+  }
+
+  .grid {
+    gap: 11px !important;
+  }
+}
   </style>
 </head>
 <body>
