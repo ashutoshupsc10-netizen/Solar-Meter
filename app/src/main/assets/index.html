@@ -2918,42 +2918,97 @@ td {
       netEl.value = net.toFixed(2);
       return net;
     }
+    
+function calcMsedclAll() {
+  const imp = diff(
+    msedclFields.importPrevious,
+    msedclFields.importCurrent,
+    msedclFields.importNet
+  );
 
-    function calcMsedclAll() {
-      const imp = diff(msedclFields.importPrevious, msedclFields.importCurrent, msedclFields.importNet);
-      const exp = diff(msedclFields.exportPrevious, msedclFields.exportCurrent, msedclFields.exportNet);
-      const gen = diff(msedclFields.genPrevious, msedclFields.genCurrent, msedclFields.genNet);
+  const exp = diff(
+    msedclFields.exportPrevious,
+    msedclFields.exportCurrent,
+    msedclFields.exportNet
+  );
 
-      // For a bill, Export Offset can be entered manually if the bill shows a specific value.
-      // If blank, use the lesser of Import and Export as a practical default for the record.
-      const offset = imp !== null ? imp : null;
+  const gen = diff(
+    msedclFields.genPrevious,
+    msedclFields.genCurrent,
+    msedclFields.genNet
+  );
 
-if (offset !== null) {
-  msedclExportOffsetE1.value = offset.toFixed(2);
+  // Export Offset:
+  // For MSEDCL bill, use Import Consumption as Export Offset.
+  // Example: Import = 217, Export = 303, Offset = 217.
+  const offset = imp !== null ? imp : null;
+
+  if (offset !== null) {
+    msedclExportOffsetEl.value = offset.toFixed(2);
+  } else {
+    msedclExportOffsetEl.value = '';
+  }
+
+  const previousBank = parseFloat(msedclPreviousBankEl.value);
+
+  // Bank Solar Units Added = Export - Export Offset
+  const bankAdded =
+    exp !== null && offset !== null
+      ? Math.max(0, exp - offset)
+      : null;
+
+  // Closing Bank = Previous Bank + Bank Added
+  const closingBank =
+    bankAdded !== null
+      ? (isNaN(previousBank) ? 0 : previousBank) + bankAdded
+      : null;
+
+  // Self Consumption = Generation - Export
+  const selfConsumption =
+    gen !== null && exp !== null
+      ? Math.max(0, gen - exp)
+      : null;
+
+  msedclSummary.import.textContent =
+    imp === null ? '0.00' : imp.toFixed(2);
+
+  msedclSummary.export.textContent =
+    exp === null ? '0.00' : exp.toFixed(2);
+
+  msedclSummary.generation.textContent =
+    gen === null ? '0.00' : gen.toFixed(2);
+
+  msedclSummary.selfConsumption.textContent =
+    selfConsumption === null
+      ? '0.00'
+      : selfConsumption.toFixed(2);
+
+  msedclSummary.offset.textContent =
+    offset === null ? '0.00' : offset.toFixed(2);
+
+  msedclSummary.bankAdded.textContent =
+    bankAdded === null ? '0.00' : bankAdded.toFixed(2);
+
+  msedclSummary.closingBank.textContent =
+    closingBank === null ? '0.00' : closingBank.toFixed(2);
+
+  msedclBankAddedEl.value =
+    bankAdded === null ? '' : bankAdded.toFixed(2);
+
+  msedclClosingBankEl.value =
+    closingBank === null ? '' : closingBank.toFixed(2);
+
+  return {
+    imp,
+    exp,
+    gen,
+    offset,
+    previousBank: isNaN(previousBank) ? 0 : previousBank,
+    bankAdded,
+    closingBank,
+    selfConsumption
+  };
 }
-
-      const previousBank = parseFloat(msedclPreviousBankEl.value);
-      const bankAdded = (exp !== null && offset !== null) ? +(exp - offset).toFixed(2) : null;
-      const closingBank = (bankAdded !== null)
-        ? +((isNaN(previousBank) ? 0 : previousBank) + bankAdded).toFixed(2)
-        : null;
-
-      const selfConsumption = (gen !== null && exp !== null) ? +(gen - exp).toFixed(2) : null;
-
-      msedclSummary.import.textContent = imp === null ? '0.00' : imp.toFixed(2);
-      msedclSummary.export.textContent = exp === null ? '0.00' : exp.toFixed(2);
-      msedclSummary.generation.textContent = gen === null ? '0.00' : gen.toFixed(2);
-      msedclSummary.selfConsumption.textContent = selfConsumption === null ? '0.00' : selfConsumption.toFixed(2);
-      msedclSummary.offset.textContent = offset === null ? '0.00' : offset.toFixed(2);
-      msedclSummary.bankAdded.textContent = bankAdded === null ? '0.00' : bankAdded.toFixed(2);
-      msedclSummary.closingBank.textContent = closingBank === null ? '0.00' : closingBank.toFixed(2);
-
-      msedclBankAddedEl.value = bankAdded === null ? '' : bankAdded.toFixed(2);
-      msedclClosingBankEl.value = closingBank === null ? '' : closingBank.toFixed(2);
-
-      return { imp, exp, gen, offset, previousBank: isNaN(previousBank) ? 0 : previousBank, bankAdded, closingBank, selfConsumption };
-    }
-
     [
       msedclFields.importPrevious, msedclFields.importCurrent,
       msedclFields.exportPrevious, msedclFields.exportCurrent,
