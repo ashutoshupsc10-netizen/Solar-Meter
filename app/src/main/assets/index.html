@@ -3240,7 +3240,87 @@ td {
         console.error(err);
       }
     });
+function exportAllCSV() {
+  const consumer = getSelectedConsumer();
 
+  let list = loadReadings();
+
+  if (consumer) {
+    list = list.filter(r => r.consumerNo === consumer);
+  }
+
+  list = list.sort((a, b) => a.date.localeCompare(b.date));
+
+  if (list.length === 0) {
+    showToast('No data to export');
+    return;
+  }
+
+  const headers = [
+    'Consumer No',
+    'Date',
+    'Reading Time',
+    'Previous Date',
+    'Previous Time',
+    'Prev Import',
+    'Curr Import',
+    'Import Units',
+    'Prev Export',
+    'Curr Export',
+    'Export Units',
+    'Prev Generation',
+    'Curr Generation',
+    'Generation Units',
+    'Net Units',
+    'Note'
+  ];
+
+  const rows = list.map(r => [
+    r.consumerNo || '',
+    r.date || '',
+    r.readingTime || '',
+    r.prevDate || '',
+    r.prevTime || '',
+    r.prevImport ?? '',
+    r.currImport ?? '',
+    r.impUnits ?? '',
+    r.prevExport ?? '',
+    r.currExport ?? '',
+    r.expUnits ?? '',
+    r.prevGen ?? '',
+    r.currGen ?? '',
+    r.genUnits ?? '',
+    r.netUnits ?? '',
+    `"${String(r.note || '').replace(/"/g, '""')}"`
+  ].join(','));
+
+  const csv = [headers.join(','), ...rows].join('\n');
+
+  const suffix = consumer || 'all';
+  const fileName =
+    `solar-meter-${suffix}-${new Date().toISOString().slice(0,10)}.csv`;
+
+  /* Android APK */
+  if (saveTextFileNative(fileName, 'text/csv', csv)) {
+    showToast('CSV save dialog opened');
+    return;
+  }
+
+  /* Browser fallback */
+  const blob = new Blob([csv], { type: 'text/csv' });
+  const url = URL.createObjectURL(blob);
+
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = fileName;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+
+  showToast('CSV downloaded');
+}
     document.getElementById('exportCsvBtnV4').addEventListener('click', () => {
       // Reuse the app's existing CSV export function when available.
       if (typeof exportAllCSV === 'function') {
