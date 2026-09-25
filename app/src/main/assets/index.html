@@ -2926,11 +2926,11 @@ td {
 
       // For a bill, Export Offset can be entered manually if the bill shows a specific value.
       // If blank, use the lesser of Import and Export as a practical default for the record.
-      let offset = parseFloat(msedclExportOffsetEl.value);
-      if (isNaN(offset)) {
-        offset = (imp !== null && exp !== null) ? Math.min(imp, exp) : null;
-        if (offset !== null) msedclExportOffsetEl.value = offset.toFixed(2);
-      }
+      const offset = imp !== null ? imp : null;
+
+if (offset !== null) {
+  msedclExportOffsetE1.value = offset.toFixed(2);
+}
 
       const previousBank = parseFloat(msedclPreviousBankEl.value);
       const bankAdded = (exp !== null && offset !== null) ? +(exp - offset).toFixed(2) : null;
