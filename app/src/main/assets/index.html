@@ -1652,6 +1652,208 @@ td {
     font-size: 13px !important;
   }
 }
+    /* =========================================================
+   PHASE 4 - TARGETED PREMIUM SOLAR READING GUI
+   ========================================================= */
+
+/* ---------- READING CARD ---------- */
+#section-reading {
+  background: #ffffff !important;
+  border: 1px solid #dce5ee !important;
+  border-radius: 22px !important;
+  box-shadow: 0 6px 22px rgba(31,41,55,0.09) !important;
+  overflow: hidden !important;
+}
+
+/* Reading main heading */
+#section-reading > h2 {
+  background: linear-gradient(135deg,#1687e8,#075bb5) !important;
+  color: #ffffff !important;
+  border-radius: 15px !important;
+  padding: 15px 18px !important;
+  margin: -2px -2px 20px -2px !important;
+  font-size: 1.15rem !important;
+  font-weight: 800 !important;
+  box-shadow: 0 5px 14px rgba(18,102,196,0.20) !important;
+}
+
+/* ---------- SECTION LABEL BASE ---------- */
+#section-reading .section-label {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+
+  width: 100% !important;
+  min-height: 58px !important;
+
+  color: #ffffff !important;
+  border: none !important;
+  border-radius: 15px !important;
+
+  padding: 11px 16px !important;
+  margin: 18px 0 12px !important;
+
+  font-size: 1.12rem !important;
+  font-weight: 800 !important;
+
+  box-shadow: 0 5px 14px rgba(31,41,55,0.14) !important;
+}
+
+/* ---------- IMPORT = BLUE ---------- */
+/* 5th div inside reading grid = Import header */
+#section-reading .section-label:nth-of-type(5) {
+  background: linear-gradient(135deg,#1976d2,#0757a8) !important;
+}
+
+/* Import icon on right */
+#section-reading .section-label:nth-of-type(5)::after {
+  content: "⚡" !important;
+  font-size: 1.55rem !important;
+}
+
+/* Import fields */
+#section-reading .section-label:nth-of-type(5) + div,
+#section-reading .section-label:nth-of-type(5) + div + div {
+  background: #eaf5ff !important;
+  border-radius: 16px !important;
+  padding: 14px !important;
+}
+
+/* ---------- EXPORT = GREEN ---------- */
+/* 8th div inside reading grid = Export header */
+#section-reading .section-label:nth-of-type(8) {
+  background: linear-gradient(135deg,#159957,#087443) !important;
+}
+
+/* Export icon */
+#section-reading .section-label:nth-of-type(8)::after {
+  content: "↗" !important;
+  font-size: 1.7rem !important;
+  font-weight: 900 !important;
+}
+
+/* Export fields */
+#section-reading .section-label:nth-of-type(8) + div,
+#section-reading .section-label:nth-of-type(8) + div + div {
+  background: #e9f9f1 !important;
+  border-radius: 16px !important;
+  padding: 14px !important;
+}
+
+/* ---------- SOLAR GENERATION = ORANGE ---------- */
+/* 11th div inside reading grid = Generation header */
+#section-reading .section-label:nth-of-type(11) {
+  background: linear-gradient(135deg,#f28c18,#d96a00) !important;
+}
+
+/* Solar icon */
+#section-reading .section-label:nth-of-type(11)::after {
+  content: "☀️" !important;
+  font-size: 1.55rem !important;
+}
+
+/* Generation fields */
+#section-reading .section-label:nth-of-type(11) + div,
+#section-reading .section-label:nth-of-type(11) + div + div {
+  background: #fff5df !important;
+  border-radius: 16px !important;
+  padding: 14px !important;
+}
+
+/* ---------- FIELD LABELS ---------- */
+#section-reading .section-label ~ div label {
+  color: #173b68 !important;
+  font-weight: 800 !important;
+  font-size: 0.95rem !important;
+}
+
+/* ---------- INPUTS ---------- */
+#section-reading input,
+#section-reading select,
+#section-reading textarea {
+  min-height: 52px !important;
+  background: #ffffff !important;
+  border: 1.5px solid #d5dee8 !important;
+  border-radius: 13px !important;
+  color: #263238 !important;
+  font-size: 16px !important;
+  font-weight: 500 !important;
+  padding: 12px 14px !important;
+}
+
+/* Focus */
+#section-reading input:focus,
+#section-reading select:focus,
+#section-reading textarea:focus {
+  border-color: #1687e8 !important;
+  box-shadow: 0 0 0 4px rgba(22,135,232,0.12) !important;
+}
+
+/* ---------- RESULT BOXES ---------- */
+#section-reading .result {
+  background: #ffffff !important;
+  border: 1px solid #dce5ee !important;
+  border-radius: 17px !important;
+  box-shadow: 0 4px 13px rgba(31,41,55,0.07) !important;
+}
+
+/* ---------- SAVE BUTTON ---------- */
+#section-reading .btn-primary {
+  background: linear-gradient(135deg,#1687e8,#075bb5) !important;
+  color: #ffffff !important;
+  border-radius: 15px !important;
+  min-height: 56px !important;
+  font-size: 1rem !important;
+  font-weight: 800 !important;
+  box-shadow: 0 6px 16px rgba(18,102,196,0.24) !important;
+}
+
+/* ---------- SECONDARY BUTTON ---------- */
+#section-reading .btn-secondary {
+  background: #eef3f8 !important;
+  color: #263238 !important;
+  border: 1px solid #d8e0e8 !important;
+  border-radius: 15px !important;
+  min-height: 52px !important;
+  font-weight: 700 !important;
+}
+
+/* ---------- MOBILE ---------- */
+@media (max-width:600px) {
+
+  #section-reading {
+    padding: 14px !important;
+    border-radius: 20px !important;
+  }
+
+  #section-reading > h2 {
+    font-size: 1.05rem !important;
+    padding: 14px !important;
+  }
+
+  #section-reading .section-label {
+    min-height: 58px !important;
+    font-size: 1rem !important;
+    padding: 11px 14px !important;
+  }
+
+  #section-reading .section-label:nth-of-type(5) + div,
+  #section-reading .section-label:nth-of-type(5) + div + div,
+  #section-reading .section-label:nth-of-type(8) + div,
+  #section-reading .section-label:nth-of-type(8) + div + div,
+  #section-reading .section-label:nth-of-type(11) + div,
+  #section-reading .section-label:nth-of-type(11) + div + div {
+    padding: 12px !important;
+    border-radius: 15px !important;
+  }
+
+  #section-reading input,
+  #section-reading select,
+  #section-reading textarea {
+    min-height: 50px !important;
+    font-size: 16px !important;
+  }
+}
   </style>
 </head>
 <body>
