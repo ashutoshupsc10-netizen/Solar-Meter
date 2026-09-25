@@ -1121,6 +1121,446 @@ td {
     gap: 11px !important;
   }
 }
+    /* =========================================================
+   SOLAR METER - PHASE 2 PREMIUM MOBILE GUI
+   ========================================================= */
+
+/* ---------- APP BACKGROUND ---------- */
+body {
+  background: #f4f7fb !important;
+  color: #263238 !important;
+}
+
+/* ---------- MAIN CONTAINER ---------- */
+.container {
+  max-width: 1100px !important;
+  margin: 0 auto !important;
+}
+
+/* ---------- TOP TITLE ---------- */
+.container > h1 {
+  color: #173b68 !important;
+  font-weight: 800 !important;
+  letter-spacing: -0.3px;
+}
+
+/* ---------- SUBTITLE ---------- */
+.subtitle {
+  color: #64748b !important;
+  font-weight: 500 !important;
+}
+
+/* =========================================================
+   QUICK NAVIGATION
+   ========================================================= */
+
+.quick-nav {
+  display: grid !important;
+  grid-template-columns: repeat(5, 1fr) !important;
+  gap: 4px !important;
+
+  background: #ffffff !important;
+  border: 1px solid #dbe4ee !important;
+  border-radius: 22px !important;
+  padding: 6px !important;
+
+  box-shadow: 0 5px 18px rgba(31,41,55,0.08) !important;
+
+  position: sticky !important;
+  top: 6px !important;
+  z-index: 50 !important;
+}
+
+.quick-nav button {
+  min-height: 58px !important;
+  border: none !important;
+  border-radius: 16px !important;
+
+  background: transparent !important;
+  color: #173b68 !important;
+
+  font-size: 14px !important;
+  font-weight: 700 !important;
+
+  transition: all 0.2s ease !important;
+}
+
+.quick-nav button:hover,
+.quick-nav button:focus {
+  background: #eaf4ff !important;
+  color: #1266c4 !important;
+  transform: translateY(-1px);
+}
+
+/* =========================================================
+   ALL MAIN CARDS
+   ========================================================= */
+
+.card {
+  background: #ffffff !important;
+  border: 1px solid #dce5ee !important;
+  border-radius: 20px !important;
+
+  box-shadow:
+    0 5px 18px rgba(31,41,55,0.08) !important;
+
+  padding: 18px !important;
+  margin-bottom: 16px !important;
+
+  overflow: hidden !important;
+}
+
+/* =========================================================
+   SECTION HEADERS
+   ========================================================= */
+
+.card h2,
+.section-title,
+.section-header {
+  border-radius: 14px !important;
+
+  color: #ffffff !important;
+  font-weight: 800 !important;
+
+  padding: 14px 16px !important;
+  margin: -4px -4px 18px -4px !important;
+
+  background: linear-gradient(
+    135deg,
+    #1266c4,
+    #0b4f9c
+  ) !important;
+
+  box-shadow: 0 5px 12px rgba(18,102,196,0.18) !important;
+}
+
+/* =========================================================
+   READING SECTION
+   ========================================================= */
+
+#section-reading {
+  border-radius: 22px !important;
+}
+
+/* Reading date/time area */
+#section-reading .grid {
+  gap: 14px !important;
+}
+
+/* =========================================================
+   LABELS
+   ========================================================= */
+
+.card label {
+  display: block !important;
+
+  color: #173b68 !important;
+  font-weight: 700 !important;
+
+  margin-bottom: 7px !important;
+}
+
+/* =========================================================
+   INPUTS + SELECTS
+   ========================================================= */
+
+.card input,
+.card select,
+.card textarea {
+  width: 100% !important;
+  box-sizing: border-box !important;
+
+  min-height: 52px !important;
+
+  background: #ffffff !important;
+  color: #263238 !important;
+
+  border: 1.5px solid #d5dee8 !important;
+  border-radius: 14px !important;
+
+  padding: 12px 14px !important;
+
+  font-size: 16px !important;
+  font-weight: 500 !important;
+
+  outline: none !important;
+
+  transition: all 0.2s ease !important;
+}
+
+.card input:focus,
+.card select:focus,
+.card textarea:focus {
+  border-color: #2389e8 !important;
+
+  box-shadow:
+    0 0 0 4px rgba(35,137,232,0.12) !important;
+
+  background: #fbfdff !important;
+}
+
+/* Placeholder */
+.card input::placeholder {
+  color: #9aa5b1 !important;
+}
+
+/* =========================================================
+   GRID IMPORT / EXPORT / GENERATION - CARD EFFECT
+   ========================================================= */
+
+/* Cards containing import fields */
+#section-reading [id*="import"] {
+  border-radius: 18px !important;
+}
+
+/* Cards containing export fields */
+#section-reading [id*="export"] {
+  border-radius: 18px !important;
+}
+
+/* Cards containing generation fields */
+#section-reading [id*="generation"] {
+  border-radius: 18px !important;
+}
+
+/* =========================================================
+   CALCULATION / RESULT BOXES
+   ========================================================= */
+
+.card .summary,
+.card .stats,
+.card .result,
+.card .metric {
+  background: #ffffff !important;
+
+  border: 1px solid #dce5ee !important;
+  border-radius: 18px !important;
+
+  box-shadow: 0 4px 12px rgba(31,41,55,0.06) !important;
+}
+
+/* =========================================================
+   BUTTONS
+   ========================================================= */
+
+button {
+  font-family: inherit !important;
+  transition: all 0.2s ease !important;
+}
+
+.btn-primary {
+  background: linear-gradient(
+    135deg,
+    #1687e8,
+    #1266c4
+  ) !important;
+
+  color: #ffffff !important;
+
+  border: none !important;
+  border-radius: 15px !important;
+
+  font-weight: 800 !important;
+
+  min-height: 54px !important;
+
+  box-shadow:
+    0 6px 14px rgba(18,102,196,0.22) !important;
+}
+
+.btn-primary:hover {
+  transform: translateY(-1px) !important;
+  box-shadow:
+    0 8px 18px rgba(18,102,196,0.28) !important;
+}
+
+.btn-secondary {
+  background: #eef3f8 !important;
+  color: #263238 !important;
+
+  border: 1px solid #d8e0e8 !important;
+  border-radius: 15px !important;
+
+  font-weight: 700 !important;
+  min-height: 52px !important;
+}
+
+/* =========================================================
+   TABLES
+   ========================================================= */
+
+table {
+  width: 100% !important;
+  border-radius: 16px !important;
+  overflow: hidden !important;
+
+  border-collapse: separate !important;
+  border-spacing: 0 !important;
+
+  background: #ffffff !important;
+
+  box-shadow: 0 4px 12px rgba(31,41,55,0.06) !important;
+}
+
+th {
+  background: #edf4fb !important;
+  color: #173b68 !important;
+  font-weight: 800 !important;
+}
+
+td {
+  color: #374151 !important;
+  background: #ffffff !important;
+}
+
+/* =========================================================
+   SETTINGS
+   ========================================================= */
+
+#section-settings .card h2,
+#section-settings .section-title,
+#section-settings .section-header {
+  background: linear-gradient(
+    135deg,
+    #536dfe,
+    #3949ab
+  ) !important;
+}
+
+/* =========================================================
+   REPORTS
+   ========================================================= */
+
+#section-period .card h2,
+#section-period .section-title,
+#section-period .section-header {
+  background: linear-gradient(
+    135deg,
+    #7b61ff,
+    #5141b5
+  ) !important;
+}
+
+/* =========================================================
+   MSEDCL
+   ========================================================= */
+
+#section-msedcl .card h2,
+#section-msedcl .section-title,
+#section-msedcl .section-header {
+  background: linear-gradient(
+    135deg,
+    #00897b,
+    #00695c
+  ) !important;
+}
+
+/* =========================================================
+   BACKUP
+   ========================================================= */
+
+#section-backup .card h2,
+#section-backup .section-title,
+#section-backup .section-header {
+  background: linear-gradient(
+    135deg,
+    #607d8b,
+    #37474f
+  ) !important;
+}
+
+/* =========================================================
+   HISTORY
+   ========================================================= */
+
+#section-history .card h2,
+#section-history .section-title,
+#section-history .section-header {
+  background: linear-gradient(
+    135deg,
+    #ef8b17,
+    #d46b00
+  ) !important;
+}
+
+/* =========================================================
+   MOBILE PREMIUM LAYOUT
+   ========================================================= */
+
+@media (max-width: 600px) {
+
+  body {
+    padding: 8px !important;
+  }
+
+  .container {
+    width: 100% !important;
+  }
+
+  .card {
+    padding: 14px !important;
+    border-radius: 18px !important;
+    margin-bottom: 14px !important;
+  }
+
+  .card h2,
+  .section-title,
+  .section-header {
+    font-size: 1.05rem !important;
+    padding: 13px 14px !important;
+
+    margin:
+      -2px
+      -2px
+      15px
+      -2px !important;
+  }
+
+  .quick-nav {
+    grid-template-columns:
+      repeat(5, minmax(0, 1fr)) !important;
+
+    border-radius: 18px !important;
+  }
+
+  .quick-nav button {
+    min-height: 52px !important;
+    padding: 5px 2px !important;
+
+    font-size: 12px !important;
+  }
+
+  .card input,
+  .card select,
+  .card textarea {
+    min-height: 50px !important;
+    font-size: 16px !important;
+  }
+
+  .btn-primary,
+  .btn-secondary {
+    min-height: 52px !important;
+  }
+}
+
+/* =========================================================
+   VERY SMALL MOBILE
+   ========================================================= */
+
+@media (max-width: 380px) {
+
+  .quick-nav button {
+    font-size: 10px !important;
+  }
+
+  .card {
+    padding: 12px !important;
+  }
+
+  .card h2 {
+    font-size: 0.98rem !important;
+  }
+}
   </style>
 </head>
 <body>
