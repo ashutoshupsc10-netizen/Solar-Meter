@@ -2949,7 +2949,59 @@ input[type="radio"] {
       bankAdded: document.getElementById('msedclSummaryBankAdded'),
       closingBank: document.getElementById('msedclSummaryClosingBank')
     };
+    
+function updateMsedclDueCountdown() {
+  if (!msedclDueCountdown) return;
 
+  const dueValue = msedclDueDateEl?.value || '';
+
+  if (!dueValue) {
+    msedclDueCountdown.textContent =
+      '📅 Due Date Countdown: Please select Due Date';
+    return;
+  }
+
+  const dueDate = new Date(dueValue + 'T23:59:59');
+  const now = new Date();
+  const diffMs = dueDate.getTime() - now.getTime();
+
+  if (isNaN(dueDate.getTime())) {
+    msedclDueCountdown.textContent =
+      '📅 Due Date Countdown: Invalid Due Date';
+    return;
+  }
+
+  if (diffMs < 0) {
+    const overdueDays =
+      Math.floor(Math.abs(diffMs) / 86400000);
+
+    msedclDueCountdown.textContent =
+      `⚠️ Due Date Passed: ${overdueDays} day(s) ago`;
+    return;
+  }
+
+  const days = Math.floor(diffMs / 86400000);
+
+  const hours = Math.floor(
+    (diffMs % 86400000) / 3600000
+  );
+
+  const minutes = Math.floor(
+    (diffMs % 3600000) / 60000
+  );
+
+  msedclDueCountdown.textContent =
+    `⏳ Due Date Countdown: ${days} day(s) ${hours} hour(s) ${minutes} min`;
+}
+
+msedclDueDateEl.addEventListener(
+  'change',
+  updateMsedclDueCountdown
+);
+
+setInterval(updateMsedclDueCountdown, 60000);
+
+updateMsedclDueCountdown();
     function loadMsedclRecords() {
       try { return JSON.parse(localStorage.getItem(MSEDCL_KEY)) || []; }
       catch { return []; }
