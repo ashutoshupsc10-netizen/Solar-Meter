@@ -3167,10 +3167,25 @@ if (bankWarningEl) {
         savedAt: new Date().toISOString()
       };
 
-      list.push(record);
-      saveMsedclRecords(list);
-      renderMsedclHistory();
-      showToast('MSEDCL / bill record saved');
+      const existingIndex = list.findIndex(r =>
+  r.consumerNo === record.consumerNo &&
+  r.billMonth === record.billMonth
+);
+
+if (existingIndex >= 0) {
+  record.id = list[existingIndex].id;
+  list[existingIndex] = record;
+
+  saveMsedclRecords(list);
+  renderMsedclHistory();
+  showToast('MSEDCL / bill record updated');
+} else {
+  list.push(record);
+
+  saveMsedclRecords(list);
+  renderMsedclHistory();
+  showToast('MSEDCL / bill record saved');
+}
     });
 
     document.getElementById('emailMsedclBtn').addEventListener('click', () => {
