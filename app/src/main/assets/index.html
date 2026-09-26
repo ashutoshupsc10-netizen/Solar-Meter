@@ -3008,7 +3008,17 @@ function calcMsedclAll() {
     bankAdded !== null
       ? (isNaN(previousBank) ? 0 : previousBank) + bankAdded
       : null;
+const bankWarningEl = document.getElementById('msedclBankWarning');
 
+if (bankWarningEl) {
+  if (closingBank !== null && closingBank < 0) {
+    bankWarningEl.style.display = 'block';
+    bankWarningEl.textContent =
+      '⚠️ Bank Solar Units exhausted / deficit. Closing balance is negative.';
+  } else {
+    bankWarningEl.style.display = 'none';
+  }
+}
   // Self Consumption = Generation - Export
   const selfConsumption =
     gen !== null && exp !== null
