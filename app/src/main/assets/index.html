@@ -2996,9 +2996,9 @@ function calcMsedclAll() {
 
   // Bank Solar Units Added = Export - Export Offset
   const bankAdded =
-    exp !== null && offset !== null
-      ? Math.max(0, exp - offset)
-      : null;
+  exp !== null && offset !== null
+    ? exp - offset
+    : null;
 
   // Closing Bank = Previous Bank + Bank Added
   const closingBank =
