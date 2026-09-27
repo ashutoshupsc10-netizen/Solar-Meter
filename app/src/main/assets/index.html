@@ -3034,6 +3034,71 @@ updateMsedclDueCountdown();
     function saveMsedclRecords(list) {
       localStorage.setItem(MSEDCL_KEY, JSON.stringify(list));
     }
+    // ===== Solar Bank History =====
+const SOLAR_BANK_KEY = 'solarBankHistory_v1';
+
+function loadSolarBankHistory() {
+  try {
+    return JSON.parse(localStorage.getItem(SOLAR_BANK_KEY)) || [];
+  } catch {
+    return [];
+  }
+}
+
+function saveSolarBankHistory(list) {
+  localStorage.setItem(SOLAR_BANK_KEY, JSON.stringify(list));
+}
+
+function renderSolarBankHistory() {
+  const body = document.getElementById('solarBankHistoryBody');
+  if (!body) return;
+
+  const list = loadSolarBankHistory();
+
+  if (list.length === 0) {
+    body.innerHTML = `
+      <tr>
+        <td colspan="4" class="empty">No Solar Bank history yet.</td>
+      </tr>
+    `;
+    return;
+  }
+
+  body.innerHTML = list.map(r => `
+    <tr>
+      <td>${r.month || '-'}</td>
+      <td>${r.previousBank ?? '-'}</td>
+      <td>${r.bankAdded ?? '-'}</td>
+      <td>${r.closingBank ?? '-'}</td>
+    </tr>
+  `).join('');
+}
+
+function saveSolarBankRecord(month, previousBank, bankAdded, closingBank) {
+  if (!month) return;
+
+  const list = loadSolarBankHistory();
+
+  const record = {
+    id: Date.now(),
+    month: month,
+    previousBank: previousBank,
+    bankAdded: bankAdded,
+    closingBank: closingBank
+  };
+
+  const existingIndex = list.findIndex(r => r.month === month);
+
+  if (existingIndex >= 0) {
+    record.id = list[existingIndex].id;
+    list[existingIndex] = record;
+  } else {
+    list.push(record);
+  }
+
+  saveSolarBankHistory(list);
+  renderSolarBankHistory();
+}
 
     function diff(previousEl, currentEl, netEl) {
       const previous = parseFloat(previousEl.value);
