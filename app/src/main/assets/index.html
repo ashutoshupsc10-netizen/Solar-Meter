@@ -3328,6 +3328,13 @@ if (existingIndex >= 0) {
   renderMsedclHistory();
   showToast('MSEDCL / bill record saved');
 }
+      // Save Solar Bank History
+saveSolarBankRecord(
+  record.billMonth,
+  record.previousBank,
+  record.bankAdded,
+  record.closingBank
+);
     });
 
     document.getElementById('emailMsedclBtn').addEventListener('click', () => {
