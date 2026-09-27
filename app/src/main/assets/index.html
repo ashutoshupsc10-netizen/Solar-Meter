@@ -3079,20 +3079,33 @@ function saveSolarBankRecord(month, previousBank, bankAdded, closingBank) {
 
   const list = loadSolarBankHistory();
 
-  const record = {
-    id: Date.now(),
-    month: month,
-    previousBank: previousBank,
-    bankAdded: bankAdded,
-    closingBank: closingBank
-  };
-
+  // Same month = update only that month's record
   const existingIndex = list.findIndex(r => r.month === month);
 
+  const record = {
+    id: existingIndex >= 0
+      ? list[existingIndex].id
+      : (crypto.randomUUID ? crypto.randomUUID() : String(Date.now())),
+
+    month: month,
+    previousBank: Number.isFinite(Number(previousBank))
+      ? Number(previousBank)
+      : 0,
+
+    bankAdded: Number.isFinite(Number(bankAdded))
+      ? Number(bankAdded)
+      : 0,
+
+    closingBank: Number.isFinite(Number(closingBank))
+      ? Number(closingBank)
+      : 0
+  };
+
   if (existingIndex >= 0) {
-    record.id = list[existingIndex].id;
+    // Update ONLY the selected/current month
     list[existingIndex] = record;
   } else {
+    // Add new month without modifying old months
     list.push(record);
   }
 
