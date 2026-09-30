@@ -3078,39 +3078,70 @@ function saveSolarBankRecord(month, previousBank, bankAdded, closingBank) {
   if (!month) return;
 
   const list = loadSolarBankHistory();
-
-  // Same month = update only that month's record
   const existingIndex = list.findIndex(r => r.month === month);
+
+  // For a new month, carry forward the latest earlier month's closing bank.
+  // For an existing month, preserve that month's stored previous bank.
+  let calculatedPreviousBank = 0;
+
+  if (existingIndex >= 0) {
+    calculatedPreviousBank = Number(list[existingIndex].previousBank) || 0;
+  } else {
+    const previousRecord = list
+      .filter(r => r.month && r.month < month)
+      .sort((a, b) => a.month.localeCompare(b.month))
+      .at(-1);
+
+    calculatedPreviousBank = previousRecord
+      ? Number(previousRecord.closingBank) || 0
+      : 0;
+  }
 
   const record = {
     id: existingIndex >= 0
       ? list[existingIndex].id
       : (crypto.randomUUID ? crypto.randomUUID() : String(Date.now())),
-
     month: month,
-    previousBank: Number.isFinite(Number(previousBank))
-      ? Number(previousBank)
-      : 0,
-
-    bankAdded: Number.isFinite(Number(bankAdded))
-      ? Number(bankAdded)
-      : 0,
-
-    closingBank: Number.isFinite(Number(closingBank))
-      ? Number(closingBank)
-      : 0
+    previousBank: calculatedPreviousBank,
+    bankAdded: Number.isFinite(Number(bankAdded)) ? Number(bankAdded) : 0,
+    closingBank: Number.isFinite(Number(closingBank)) ? Number(closingBank) : 0
   };
 
   if (existingIndex >= 0) {
-    // Update ONLY the selected/current month
     list[existingIndex] = record;
   } else {
-    // Add new month without modifying old months
     list.push(record);
   }
 
   saveSolarBankHistory(list);
   renderSolarBankHistory();
+}
+
+// Set Previous Bank before calculating a new/updating MSEDCL bill.
+// Existing month: keep that month's saved Previous Bank.
+// New month: carry forward the latest earlier Solar Bank Closing Bank.
+function setMsedclPreviousBankForCurrentMonth() {
+  const month = msedclBillMonthEl.value;
+  if (!month) return;
+
+  const consumer = getSelectedConsumer();
+  const msedclList = loadMsedclRecords()
+    .filter(r => !consumer || r.consumerNo === consumer);
+
+  const existingRecord = msedclList.find(r => r.billMonth === month);
+
+  if (existingRecord) {
+    msedclPreviousBankEl.value = Number(existingRecord.previousBank || 0).toFixed(2);
+  } else {
+    const solarList = loadSolarBankHistory()
+      .filter(r => r.month && r.month < month)
+      .sort((a, b) => a.month.localeCompare(b.month));
+
+    const previousRecord = solarList.at(-1);
+    msedclPreviousBankEl.value = previousRecord
+      ? Number(previousRecord.closingBank || 0).toFixed(2)
+      : '0.00';
+  }
 }
 
     function diff(previousEl, currentEl, netEl) {
@@ -3257,13 +3288,7 @@ if (bankWarningEl) {
     }
 
     function setMsedclPreviousBankFromLastRecord() {
-      const consumer = getSelectedConsumer();
-      const list = loadMsedclRecords()
-        .filter(r => !consumer || r.consumerNo === consumer)
-        .sort((a,b) => (b.billMonth || b.date || '').localeCompare(a.billMonth || a.date || ''));
-      if (list.length && !msedclPreviousBankEl.value) {
-        msedclPreviousBankEl.value = Number(list[0].closingBank || 0).toFixed(2);
-      }
+      setMsedclPreviousBankForCurrentMonth();
       calcMsedclAll();
     }
 
@@ -3277,6 +3302,10 @@ if (bankWarningEl) {
         return;
       }
 
+      // Carry forward the previous month's Solar Bank Closing balance.
+      setMsedclPreviousBankForCurrentMonth();
+      // Carry forward the previous month's Solar Bank Closing balance.
+      setMsedclPreviousBankForCurrentMonth();
       const values = calcMsedclAll();
       if ([values.imp, values.exp, values.gen].some(v => v === null)) {
         alert('Please enter Previous and Current readings for Import, Export and Total Generation.');
