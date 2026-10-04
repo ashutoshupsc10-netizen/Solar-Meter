@@ -255,7 +255,7 @@
       max-width: 760px;
       margin: 0 auto;
       padding: 14px 14px 70px;
-      font-family: Arial, Helvetica, sans-serif;
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
     }
 
     .app-header {
@@ -654,7 +654,7 @@
       max-width: 760px;
       margin: 0 auto;
       padding: 14px 14px 70px;
-      font-family: Arial, Helvetica, sans-serif;
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
     }
 
     .app-header {
@@ -3080,68 +3080,67 @@ function saveSolarBankRecord(month, previousBank, bankAdded, closingBank) {
   const list = loadSolarBankHistory();
   const existingIndex = list.findIndex(r => r.month === month);
 
-  // For a new month, carry forward the latest earlier month's closing bank.
-  // For an existing month, preserve that month's stored previous bank.
-  let calculatedPreviousBank = 0;
-
-  if (existingIndex >= 0) {
-    calculatedPreviousBank = Number(list[existingIndex].previousBank) || 0;
-  } else {
-    const previousRecord = list
-      .filter(r => r.month && r.month < month)
-      .sort((a, b) => a.month.localeCompare(b.month))
-      .at(-1);
-
-    calculatedPreviousBank = previousRecord
-      ? Number(previousRecord.closingBank) || 0
-      : 0;
-  }
-
   const record = {
     id: existingIndex >= 0
       ? list[existingIndex].id
       : (crypto.randomUUID ? crypto.randomUUID() : String(Date.now())),
-    month: month,
-    previousBank: calculatedPreviousBank,
+    month,
+    previousBank: Number.isFinite(Number(previousBank)) ? Number(previousBank) : 0,
     bankAdded: Number.isFinite(Number(bankAdded)) ? Number(bankAdded) : 0,
     closingBank: Number.isFinite(Number(closingBank)) ? Number(closingBank) : 0
   };
 
+  // Save/update the selected month using the values currently calculated on screen.
   if (existingIndex >= 0) {
     list[existingIndex] = record;
   } else {
     list.push(record);
   }
 
+  // Keep the Solar Bank chain consistent after an edit:
+  // every later month starts from the previous month's closing bank.
+  list.sort((a, b) => (a.month || '').localeCompare(b.month || ''));
+  const selectedIndex = list.findIndex(r => r.month === month);
+
+  if (selectedIndex >= 0) {
+    // The selected month's Previous Bank is the value calculated/entered for it.
+    list[selectedIndex].previousBank = Number.isFinite(Number(previousBank))
+      ? Number(previousBank)
+      : 0;
+    list[selectedIndex].bankAdded = Number.isFinite(Number(bankAdded))
+      ? Number(bankAdded)
+      : 0;
+    list[selectedIndex].closingBank = Number(
+      (list[selectedIndex].previousBank + list[selectedIndex].bankAdded).toFixed(2)
+    );
+
+    // Rebuild all following months from the corrected closing balance.
+    for (let i = selectedIndex + 1; i < list.length; i++) {
+      const prevClosing = Number(list[i - 1].closingBank) || 0;
+      const added = Number(list[i].bankAdded) || 0;
+      list[i].previousBank = Number(prevClosing.toFixed(2));
+      list[i].closingBank = Number((prevClosing + added).toFixed(2));
+    }
+  }
+
   saveSolarBankHistory(list);
   renderSolarBankHistory();
 }
 
-// Set Previous Bank before calculating a new/updating MSEDCL bill.
-// Existing month: keep that month's saved Previous Bank.
-// New month: carry forward the latest earlier Solar Bank Closing Bank.
+// Set Previous Bank from Solar Bank History.
+// Solar Bank History is the single source of truth for the bank balance.
 function setMsedclPreviousBankForCurrentMonth() {
   const month = msedclBillMonthEl.value;
   if (!month) return;
 
-  const consumer = getSelectedConsumer();
-  const msedclList = loadMsedclRecords()
-    .filter(r => !consumer || r.consumerNo === consumer);
+  const solarList = loadSolarBankHistory()
+    .filter(r => r.month && r.month < month)
+    .sort((a, b) => a.month.localeCompare(b.month));
 
-  const existingRecord = msedclList.find(r => r.billMonth === month);
+  const previousRecord = solarList.length ? solarList[solarList.length - 1] : null;
+  const previousBank = previousRecord ? (Number(previousRecord.closingBank) || 0) : 0;
 
-  if (existingRecord) {
-    msedclPreviousBankEl.value = Number(existingRecord.previousBank || 0).toFixed(2);
-  } else {
-    const solarList = loadSolarBankHistory()
-      .filter(r => r.month && r.month < month)
-      .sort((a, b) => a.month.localeCompare(b.month));
-
-    const previousRecord = solarList.at(-1);
-    msedclPreviousBankEl.value = previousRecord
-      ? Number(previousRecord.closingBank || 0).toFixed(2)
-      : '0.00';
-  }
+  msedclPreviousBankEl.value = previousBank.toFixed(2);
 }
 
     function diff(previousEl, currentEl, netEl) {
@@ -3302,9 +3301,7 @@ if (bankWarningEl) {
         return;
       }
 
-      // Carry forward the previous month's Solar Bank Closing balance.
-      setMsedclPreviousBankForCurrentMonth();
-      // Carry forward the previous month's Solar Bank Closing balance.
+      // Always calculate Previous Bank from Solar Bank History.
       setMsedclPreviousBankForCurrentMonth();
       const values = calcMsedclAll();
       if ([values.imp, values.exp, values.gen].some(v => v === null)) {
@@ -3433,6 +3430,12 @@ saveSolarBankRecord(
     consumerSelect.addEventListener('change', () => {
       setMsedclPreviousBankFromLastRecord();
       renderMsedclHistory();
+    });
+
+    // Recalculate Previous Bank whenever the Bill Month changes.
+    msedclBillMonthEl.addEventListener('change', () => {
+      setMsedclPreviousBankForCurrentMonth();
+      calcMsedclAll();
     });
 
 
