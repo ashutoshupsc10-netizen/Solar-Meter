@@ -1944,6 +1944,38 @@ input[type="radio"] {
 }
 </style>
   </style>
+
+<style id="separate-section-pages">
+/* =========================================================
+   SEPARATE SECTION PAGES
+   Each top tab behaves like a separate app screen.
+   Only the selected section is visible.
+   ========================================================= */
+
+.section-page-hidden {
+  display: none !important;
+}
+
+/* Keep the navigation available while working inside a long section. */
+#quickNav {
+  position: sticky !important;
+  top: 4px !important;
+  z-index: 1000 !important;
+}
+
+/* Active tab */
+#quickNav button.section-page-active {
+  background: linear-gradient(135deg, #1687e8, #1266c4) !important;
+  color: #ffffff !important;
+  box-shadow: 0 5px 12px rgba(18,102,196,0.22) !important;
+}
+
+/* Do not animate/scroll the whole document when switching sections. */
+html {
+  scroll-behavior: auto !important;
+}
+</style>
+
 </head>
 <body>
   <div class="container">
@@ -3129,6 +3161,44 @@ function saveSolarBankRecord(month, previousBank, bankAdded, closingBank) {
 
 // Set Previous Bank from Solar Bank History.
 // Solar Bank History is the single source of truth for the bank balance.
+// Import existing MSEDCL bill records into Solar Bank History.
+// This is needed for records that were saved before Solar Bank History was added.
+function syncSolarBankHistoryFromMsedclRecords() {
+  const msedclList = loadMsedclRecords();
+  if (!msedclList.length) return;
+
+  const bankList = loadSolarBankHistory();
+  const byMonth = new Map(bankList.map(r => [r.month, r]));
+
+  msedclList
+    .filter(r => r && r.billMonth)
+    .sort((a, b) => String(a.billMonth).localeCompare(String(b.billMonth)))
+    .forEach(r => {
+      const month = r.billMonth;
+      if (byMonth.has(month)) return;
+
+      const previousBank = Number.isFinite(Number(r.previousBank)) ? Number(r.previousBank) : 0;
+      const bankAdded = Number.isFinite(Number(r.bankAdded)) ? Number(r.bankAdded) : 0;
+      const closingBank = Number.isFinite(Number(r.closingBank))
+        ? Number(r.closingBank)
+        : Number((previousBank + bankAdded).toFixed(2));
+
+      const record = {
+        id: (crypto.randomUUID ? crypto.randomUUID() : String(Date.now()) + month),
+        month,
+        previousBank,
+        bankAdded,
+        closingBank
+      };
+
+      bankList.push(record);
+      byMonth.set(month, record);
+    });
+
+  bankList.sort((a, b) => String(a.month || '').localeCompare(String(b.month || '')));
+  saveSolarBankHistory(bankList);
+}
+
 function setMsedclPreviousBankForCurrentMonth() {
   const month = msedclBillMonthEl.value;
   if (!month) return;
@@ -4105,9 +4175,103 @@ function exportAllCSV() {
     }
     refreshConsumerDropdown();
     renderHistory();
+    // Restore Solar Bank History from existing MSEDCL records, then render it.
+    syncSolarBankHistoryFromMsedclRecords();
+    renderSolarBankHistory();
     renderMsedclHistory();
     calcUnits();
     calcMonthlyTotals();
   </script>
+
+<script id="separate-section-pages-script">
+(function () {
+  const nav = document.getElementById('quickNav');
+  if (!nav) return;
+
+  const sectionIds = [
+    'section-consumer',
+    'section-reading',
+    'section-settings',
+    'section-period',
+    'section-msedcl',
+    'section-backup',
+    'section-history'
+  ];
+
+  const buttons = Array.from(nav.querySelectorAll('button[data-target]'));
+
+  function showSection(targetId, updateHash = true) {
+    const target = document.getElementById(targetId);
+    if (!target) return;
+
+    // Hide every top-level app section.
+    sectionIds.forEach(id => {
+      const section = document.getElementById(id);
+      if (!section) return;
+      section.classList.toggle('section-page-hidden', id !== targetId);
+    });
+
+    // Make the selected section active/open.
+    target.classList.remove('collapsed');
+    const toggle = target.querySelector('.card-toggle');
+    if (toggle) {
+      toggle.textContent = '▲';
+      toggle.setAttribute('aria-label', 'Collapse section');
+    }
+
+    // Update active navigation button.
+    buttons.forEach(btn => {
+      btn.classList.toggle('section-page-active', btn.dataset.target === targetId);
+      btn.setAttribute(
+        'aria-current',
+        btn.dataset.target === targetId ? 'page' : 'false'
+      );
+    });
+
+    // Remember the current screen without scrolling to a section.
+    if (updateHash) {
+      const shortName = targetId.replace(/^section-/, '');
+      if (history.replaceState) {
+        history.replaceState(null, '', '#' + shortName);
+      }
+    }
+
+    // Every tab opens from the top of its own screen.
+    window.scrollTo(0, 0);
+  }
+
+  function getInitialSection() {
+    const hash = (window.location.hash || '').replace(/^#/, '');
+    const hashTarget = 'section-' + hash;
+    if (sectionIds.includes(hashTarget)) return hashTarget;
+    return 'section-consumer';
+  }
+
+  // Remove the old quick-nav click handlers that performed scrollIntoView().
+  // Cloning keeps all existing styling/data-target attributes.
+  buttons.forEach(btn => {
+    const fresh = btn.cloneNode(true);
+    btn.replaceWith(fresh);
+  });
+
+  const freshButtons = Array.from(nav.querySelectorAll('button[data-target]'));
+
+  freshButtons.forEach(btn => {
+    btn.addEventListener('click', function (event) {
+      event.preventDefault();
+      showSection(this.dataset.target, true);
+    });
+  });
+
+  window.addEventListener('hashchange', function () {
+    const target = getInitialSection();
+    showSection(target, false);
+  });
+
+  // Initial screen.
+  showSection(getInitialSection(), false);
+})();
+</script>
+
 </body>
 </html>
