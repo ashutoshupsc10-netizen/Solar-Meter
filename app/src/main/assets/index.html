@@ -1982,6 +1982,7 @@ html {
     <h1>☀️ Solar Meter Readings</h1>
     <p class="subtitle">Manually enter <strong>Import</strong>, <strong>Export</strong> &amp; <strong>Solar Generation</strong> readings. Units = <strong>Current − Previous</strong>.</p>
     <div class="quick-nav" id="quickNav" aria-label="Quick navigation">
+      <button type="button" data-target="section-dashboard">📊 Dashboard</button>
       <button type="button" data-target="section-consumer">👤 Consumer</button>
       <button type="button" data-target="section-reading">📝 Reading</button>
       <button type="button" data-target="section-settings">⚙️ Settings</button>
@@ -1991,6 +1992,29 @@ html {
       <button type="button" data-target="section-history">📋 History</button>
     </div>
 
+
+    <!-- Solar Performance Dashboard -->
+    <div class="card" id="section-dashboard">
+      <h2>📊 Solar Performance Dashboard</h2>
+      <p class="hint" id="dashboardScope">Selected consumer · current month and year-to-date summary</p>
+      <h3 style="margin:14px 0 8px;color:var(--text);font-size:1rem;">This Month</h3>
+      <div class="result-box" id="dashboardMonthMetrics">
+        <div class="result import"><div class="label">Import Units</div><div class="value" id="dashMonthImport">0.00</div></div>
+        <div class="result export"><div class="label">Export Units</div><div class="value" id="dashMonthExport">0.00</div></div>
+        <div class="result gen"><div class="label">Solar Generation</div><div class="value" id="dashMonthGeneration">0.00</div></div>
+        <div class="result net"><div class="label">Self-Consumption</div><div class="value" id="dashMonthSelf">0.00</div></div>
+        <div class="result net"><div class="label">Self-Consumption %</div><div class="value" id="dashMonthSelfPct">—</div></div>
+        <div class="result net"><div class="label">Readings Saved</div><div class="value" id="dashMonthCount">0</div></div>
+      </div>
+      <h3 style="margin:18px 0 8px;color:var(--text);font-size:1rem;">Year to Date</h3>
+      <div class="result-box" id="dashboardYearMetrics">
+        <div class="result import"><div class="label">Import Units</div><div class="value" id="dashYearImport">0.00</div></div>
+        <div class="result export"><div class="label">Export Units</div><div class="value" id="dashYearExport">0.00</div></div>
+        <div class="result gen"><div class="label">Solar Generation</div><div class="value" id="dashYearGeneration">0.00</div></div>
+        <div class="result net"><div class="label">Self-Consumption</div><div class="value" id="dashYearSelf">0.00</div></div>
+      </div>
+      <p class="hint" id="dashboardInsight" role="status">Add readings to see your solar performance.</p>
+    </div>
 
     <!-- Consumer Selector -->
     <div class="card" id="section-consumer">
@@ -2538,6 +2562,43 @@ html {
 
     function getSelectedConsumer() {
       return consumerSelect.value || '';
+    }
+
+    // Dashboard uses the saved reading units and never changes stored data.
+    function updateSolarPerformanceDashboard() {
+      const consumer = getSelectedConsumer();
+      const all = loadReadings().filter(r => !consumer || r.consumerNo === consumer);
+      const now = new Date();
+      const monthKey = now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0');
+      const yearKey = String(now.getFullYear());
+      const monthRows = all.filter(r => r.date && r.date.startsWith(monthKey));
+      const yearRows = all.filter(r => r.date && r.date.startsWith(yearKey));
+      const summarize = rows => {
+        const imp = rows.reduce((sum, r) => sum + (Number(r.impUnits) || 0), 0);
+        const exp = rows.reduce((sum, r) => sum + (Number(r.expUnits) || 0), 0);
+        const gen = rows.reduce((sum, r) => sum + (r.genUnits == null ? 0 : (Number(r.genUnits) || 0)), 0);
+        const self = Math.max(0, gen - exp);
+        return { imp, exp, gen, self, count: rows.length, selfPct: gen > 0 ? (self / gen * 100) : null };
+      };
+      const month = summarize(monthRows);
+      const year = summarize(yearRows);
+      const fmt = n => Number(n).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      const put = (id, value) => { const el = document.getElementById(id); if (el) el.textContent = value; };
+      put('dashboardScope', (consumer ? 'Consumer: ' + consumer : 'All consumers') + ' · ' + now.toLocaleString('en-IN', { month: 'long', year: 'numeric' }) + ' and ' + yearKey + ' year-to-date');
+      put('dashMonthImport', fmt(month.imp)); put('dashMonthExport', fmt(month.exp));
+      put('dashMonthGeneration', fmt(month.gen)); put('dashMonthSelf', fmt(month.self));
+      put('dashMonthSelfPct', month.selfPct == null ? '—' : month.selfPct.toFixed(1) + '%');
+      put('dashMonthCount', String(month.count));
+      put('dashYearImport', fmt(year.imp)); put('dashYearExport', fmt(year.exp));
+      put('dashYearGeneration', fmt(year.gen)); put('dashYearSelf', fmt(year.self));
+      const insight = document.getElementById('dashboardInsight');
+      if (insight) {
+        if (!all.length) insight.textContent = 'No saved readings for this selection yet. Add a reading to start tracking performance.';
+        else if (!month.count) insight.textContent = 'No readings saved for this month. The monthly totals are zero; year-to-date totals include saved readings for ' + yearKey + '.';
+        else insight.textContent = month.selfPct == null
+          ? month.count + ' reading(s) saved this month. Generation data is missing, so self-consumption percentage cannot be calculated.'
+          : month.count + ' reading(s) saved this month. Self-consumption is ' + month.selfPct.toFixed(1) + '% of recorded solar generation.';
+      }
     }
 
     function refreshConsumerDropdown() {
@@ -3731,6 +3792,7 @@ function exportAllCSV() {
     // ===== Compact mobile sections / quick navigation =====
     function setupCompactSections() {
       const ids = [
+        'section-dashboard',
         'section-consumer',
         'section-reading',
         'section-settings',
@@ -3773,8 +3835,8 @@ function exportAllCSV() {
           }
         });
 
-        // Keep Consumer and Reading open; collapse longer secondary sections.
-        setCollapsed(index >= 2);
+        // Keep Dashboard, Consumer and Reading open; collapse longer secondary sections.
+        setCollapsed(index >= 3);
       });
 
       document.querySelectorAll('#quickNav button').forEach(btn => {
@@ -4167,6 +4229,7 @@ function exportAllCSV() {
     renderHistory = function() {
       originalRenderHistory();
       calcMonthlyTotals();
+      updateSolarPerformanceDashboard();
     };
 
     // Seed default consumer from the bill if none exist
@@ -4181,6 +4244,7 @@ function exportAllCSV() {
     renderMsedclHistory();
     calcUnits();
     calcMonthlyTotals();
+    updateSolarPerformanceDashboard();
   </script>
 
 <script id="separate-section-pages-script">
@@ -4189,6 +4253,7 @@ function exportAllCSV() {
   if (!nav) return;
 
   const sectionIds = [
+    'section-dashboard',
     'section-consumer',
     'section-reading',
     'section-settings',
